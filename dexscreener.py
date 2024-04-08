@@ -121,7 +121,7 @@ class DexScreenerClient:
             if not is_solana_address(address):
                 raise InvalidSolanaAddress(address)
         token_addresses_str = ",".join(token_addresses)
-        url = f"https://api.dexscreener.com/token/{token_addresses_str}"
+        url = f"https://api.dexscreener.com/latest/dex/tokens/:{token_addresses_str}"
         response = requests.get(url)
         self._validate_response(response)
         return response.json()
@@ -144,13 +144,13 @@ class DexScreenerClient:
         for address in token_addresses:
             if not is_solana_address(address):
                 raise InvalidSolanaAddress(address)
-            url = f"https://api.dexscreener.com/token/{address}"
+            url = f"https://api.dexscreener.com/latest/dex/tokens/{address}"
             response = requests.get(url)
             self._validate_response(response)
             data = response.json()
             price = Decimal(data.get("price", 0))
             liquidity = Decimal(data.get("liquidity", 0))
-            prices[address] = PriceInfo(price=price, liquidity=liquidity)
+            prices[address] = PriceInfo(price, liquidity)
 
         return prices
 
@@ -167,7 +167,7 @@ class DexScreenerClient:
         """
         if not is_solana_address(address):
             raise InvalidSolanaAddress(address)
-        url = f"https://api.dexscreener.com/token/{address}"
+        url = f"https://api.dexscreener.com/latest/dex/tokens/{address}"
         response = requests.get(url)
         self._validate_response(response)
         data = response.json()

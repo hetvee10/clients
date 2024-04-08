@@ -58,7 +58,7 @@ class BirdEyeClient:
             data = response.json()
             prices = {}
             invalid_tokens = []
-            for token_address, token_data in data.items():
+            for token_address, token_data in data["data"].items():
                 if "value" in token_data and "liquidity" in token_data:
                     price_info = PriceInfo(Decimal(token_data["value"]), Decimal(token_data["liquidity"]))
                     prices[token_address] = price_info
@@ -89,19 +89,20 @@ class BirdEyeClient:
         """
         if not is_solana_address(address):
             raise InvalidSolanaAddress(address)
-        url = f"https://public-api.birdeye.so/public/multi_price?list_address={address}"
+        url = f"https://public-api.birdeye.so/public/multi_price?include_liquidity=true&include_decimals=true&list_address={address}"
         response = self._make_api_call("GET", url)
         if response.status_code == 200:
-            data = response.json()
-            if "price" not in data:
-                raise InvalidTokens()
+            data = response.json()["data"]
+            token_data = data.get(address, {})
+            if not token_data:
+                raise InvalidTokens(address)
 
-            price = Decimal(data.get("price", 0))
-            symbol = data.get("symbol", "")
-            decimals = int(data.get("decimals", 0))
-            last_trade_unix_time = int(data.get("lastTradeUnixTime", 0))
-            liquidity = Decimal(data.get("liquidity", 0))
-            supply = Decimal(data.get("supply", 0))
+            price = Decimal(token_data.get("value", 0))
+            symbol = token_data.get("symbol", "")
+            decimals = int(token_data.get("decimals", 0))
+            last_trade_unix_time = int(token_data.get("lastTradeUnixTime", 0))
+            liquidity = Decimal(token_data.get("liquidity", 0))
+            supply = Decimal(token_data.get("supply", 0))
 
             if decimals == 0:
                 raise DecimalsNotFoundError()
