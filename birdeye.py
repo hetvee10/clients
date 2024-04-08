@@ -4,6 +4,7 @@ import requests
 from custom_exceptions import NoPositionsError, InvalidTokens, InvalidSolanaAddress, DecimalsNotFoundError, NO_LIQUDITY
 
 from common import PriceInfo, TokenOverview
+from helpers import is_solana_address
 
 
 class Config:
@@ -86,7 +87,7 @@ class BirdEyeClient:
             DecimalsNotFoundError: Raised if the API response does not contain decimals
             InvalidTokens: Raised if the API call was unsuccessful
         """
-        if not self.is_solana_address(address):
+        if not is_solana_address(address):
             raise InvalidSolanaAddress(address)
         url = f"https://public-api.birdeye.so/public/multi_price?list_address={address}"
         response = self._make_api_call("GET", url)

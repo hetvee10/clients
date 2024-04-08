@@ -120,7 +120,6 @@ class DexScreenerClient:
         for address in token_addresses:
             if not is_solana_address(address):
                 raise InvalidSolanaAddress(address)
-        response = {}
         token_addresses_str = ",".join(token_addresses)
         url = f"https://api.dexscreener.com/token/{token_addresses_str}"
         response = requests.get(url)
