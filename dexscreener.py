@@ -200,7 +200,3 @@ class DexScreenerClient:
                     max_liquidity_usd = liquidity_usd
                     max_entry = entry
         return max_entry
-
-
-result = DexScreenerClient()
-print(result.fetch_token_overview("EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm"))
