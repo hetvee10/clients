@@ -147,9 +147,9 @@ class DexScreenerClient:
             url = f"https://api.dexscreener.com/latest/dex/tokens/{address}"
             response = requests.get(url)
             self._validate_response(response)
-            data = response.json()
-            price = Decimal(data.get("price", 0))
-            liquidity = Decimal(data.get("liquidity", 0))
+            data = response.json()['pairs']
+            price = Decimal(data[0].get("priceNative", 0))
+            liquidity = Decimal(data[0]['liquidity'].get("usd", 0))
             prices[address] = PriceInfo(price, liquidity)
 
         return prices
@@ -170,12 +170,12 @@ class DexScreenerClient:
         url = f"https://api.dexscreener.com/latest/dex/tokens/{address}"
         response = requests.get(url)
         self._validate_response(response)
-        data = response.json()
-        price = Decimal(data.get("price", 0))
-        symbol = data.get("symbol", "")
+        data = response.json()["pairs"][0]
+        price = Decimal(data.get("priceNative", 0))
+        symbol = data["quoteToken"].get("symbol", "")
         decimals = int(data.get("decimals", 0))
         last_trade_unix_time = int(data.get("lastTradeUnixTime", 0))
-        liquidity = Decimal(data.get("liquidity", 0))
+        liquidity = Decimal(data["liquidity"].get("usd", 0))
         supply = Decimal(data.get("supply", 0))
         overview = TokenOverview(
             price=price,
@@ -200,3 +200,7 @@ class DexScreenerClient:
                     max_liquidity_usd = liquidity_usd
                     max_entry = entry
         return max_entry
+
+
+result = DexScreenerClient()
+print(result.fetch_token_overview("EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm"))
